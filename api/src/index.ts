@@ -10,6 +10,13 @@ const port = 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
+// using GET so I test easily on the browser, ideally, should be a POST
+app.get('/products/:productId/purchase', async (req, res: Response) => {
+  // ideally user is got from `req.user` & payment method from POST body
+  const purchase = await executePurchase('', +req.params.productId, '');
+  res.send(purchase)
+});
+
 app.get('/products', (_, res: Response) => {
   res.send(PRODUCTS)
 });
