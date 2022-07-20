@@ -54,7 +54,7 @@ describe('Risk', () => {
                 expect(risk).toBe(RiskOutcome.ACCEPTED);
             });
 
-            test('should return FLAGGED_FOR_REVIEW if risk score is less between 80 and 90', async () => {
+            test('should return FLAGGED_FOR_REVIEW if risk score is between 80 and 90', async () => {
                 // arrange
                 const spy = jest.spyOn(RiskApi, 'getRiskScore')
                 spy.mockResolvedValue(85)

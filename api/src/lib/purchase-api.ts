@@ -48,7 +48,8 @@ export const executePurchase = async (userId: string, productId: number, payment
         userId,
         productId,
         paymentMethodId,
-        status: PurchaseStatus.PENDING
+        status: PurchaseStatus.PENDING,
+        createdAt: new Date().toISOString()
     };
 
     // get product..., otherwise PurchaseStatus.INVALID_DETAILS

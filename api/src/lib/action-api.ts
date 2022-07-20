@@ -13,6 +13,7 @@ interface PurchaseDetails {
   productId: number;
   paymentMethodId: string;
   status: PurchaseStatus;
+  createdAt: string
 }
 
 const acceptPurchase = async (purchaseDetails: PurchaseDetails): Promise<void> => getDelayedVoid();

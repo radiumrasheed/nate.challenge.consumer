@@ -18,7 +18,7 @@ describe('Purchase API', () => {
             expect(product.productId).toBeDefined()
         });
 
-        test('should return null value for product', () => {
+        test('should return null value for missing product', () => {
             // arrange
             let productId = 999
 
@@ -32,7 +32,7 @@ describe('Purchase API', () => {
     })
 
     describe('isAffordable', () => {
-        test('should return true if customer has more balance than product', async () => {
+        test('should return TRUE if customer has more balance than product', async () => {
             // arrange
             let product = PRODUCTS[0]
             const spy = jest.spyOn(RiskApi, 'getAccountBalance');
@@ -46,7 +46,7 @@ describe('Purchase API', () => {
             spy.mockRestore();
         });
 
-        test('should return false if customer has less balance than product', async () => {
+        test('should return FALSE if customer has less balance than product', async () => {
             // arrange
             let product = PRODUCTS[0]
             const spy = jest.spyOn(RiskApi, 'getAccountBalance');
@@ -60,7 +60,7 @@ describe('Purchase API', () => {
             spy.mockRestore();
         });
 
-        test('should return true if customer has same balance as product', async () => {
+        test('should return TRUE if customer has same balance as product', async () => {
             // arrange
             let product = PRODUCTS[0]
             const spy = jest.spyOn(RiskApi, 'getAccountBalance');
@@ -76,7 +76,7 @@ describe('Purchase API', () => {
     })
 
     describe('executePurchase', () => {
-        test('should return INVALID if product does not exist', async () => {
+        test('should return INVALID_DETAILS if product does not exist', async () => {
             // arrange
             let productId = 9999
 
@@ -101,61 +101,63 @@ describe('Purchase API', () => {
             spy.mockRestore()
         });
 
-        test('should return ACCEPTED if balance is OK and risk is accepted', async () => {
-            // arrange
+        describe('when balance is OK,', () => {
+            let spyOnAccountBalance: jest.SpyInstance
             let product = PRODUCTS[0]
-            const spy = jest.spyOn(RiskApi, 'getAccountBalance');
-            const spy2 = jest.spyOn(Risk, 'assessRisk');
-            spy.mockResolvedValue(product.productPrice)
-            spy2.mockResolvedValue(RiskOutcome.ACCEPTED)
 
-            // act
-            const response = await executePurchase('john', product.productId, 'NATE')
+            beforeEach(() => {
+                spyOnAccountBalance = jest.spyOn(RiskApi, 'getAccountBalance');
+                spyOnAccountBalance.mockResolvedValue(product.productPrice)
+            })
 
-            // assert
-            expect(response).toBe(PurchaseStatus.SUCCESS);
+            afterEach(() => {
+                spyOnAccountBalance.mockRestore()
+            })
 
-            // cleanup
-            spy.mockRestore()
-            spy2.mockRestore()
-        });
+            test('should return ACCEPTED if risk is accepted', async () => {
+                // arrange
+                const spy = jest.spyOn(Risk, 'assessRisk');
+                spy.mockResolvedValue(RiskOutcome.ACCEPTED)
 
-        test('should return REJECTED if balance is OK and risk is rejected', async () => {
-            // arrange
-            let product = PRODUCTS[0]
-            const spy = jest.spyOn(RiskApi, 'getAccountBalance');
-            const spy2 = jest.spyOn(Risk, 'assessRisk');
-            spy.mockResolvedValue(product.productPrice)
-            spy2.mockResolvedValue(RiskOutcome.REJECTED)
+                // act
+                const response = await executePurchase('john', product.productId, 'NATE')
 
-            // act
-            const response = await executePurchase('john', product.productId, 'NATE')
+                // assert
+                expect(response).toBe(PurchaseStatus.SUCCESS);
 
-            // assert
-            expect(response).toBe(PurchaseStatus.REJECTED);
+                // cleanup
+                spy.mockRestore()
+            });
 
-            // cleanup
-            spy.mockRestore()
-            spy2.mockRestore()
-        });
+            test('should return REJECTED if risk is rejected', async () => {
+                // arrange
+                const spy = jest.spyOn(Risk, 'assessRisk');
+                spy.mockResolvedValue(RiskOutcome.REJECTED)
 
-        test('should return REJECTED if balance is OK and risk is rejected', async () => {
-            // arrange
-            let product = PRODUCTS[0]
-            const spy = jest.spyOn(RiskApi, 'getAccountBalance');
-            const spy2 = jest.spyOn(Risk, 'assessRisk');
-            spy.mockResolvedValue(product.productPrice)
-            spy2.mockResolvedValue(RiskOutcome.FLAGGED_FOR_REVIEW)
+                // act
+                const response = await executePurchase('john', product.productId, 'NATE')
 
-            // act
-            const response = await executePurchase('john', product.productId, 'NATE')
+                // assert
+                expect(response).toBe(PurchaseStatus.REJECTED);
 
-            // assert
-            expect(response).toBe(PurchaseStatus.PENDING);
+                // cleanup
+                spy.mockRestore()
+            });
 
-            // cleanup
-            spy.mockRestore()
-            spy2.mockRestore()
-        });
+            test('should return PENDING if risk is flagged for review', async () => {
+                // arrange
+                const spy = jest.spyOn(Risk, 'assessRisk');
+                spy.mockResolvedValue(RiskOutcome.FLAGGED_FOR_REVIEW)
+
+                // act
+                const response = await executePurchase('john', product.productId, 'NATE')
+
+                // assert
+                expect(response).toBe(PurchaseStatus.PENDING);
+
+                // cleanup
+                spy.mockRestore()
+            });
+        })
     })
 })
