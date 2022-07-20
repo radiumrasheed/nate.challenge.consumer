@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 // using GET as it's easily testable on the browser, ideally, should be a POST
 app.get('/products/:productId/purchase', async (req, res: Response) => {
   // ideally user is got from `req.user` & payment method from POST body
-  const purchase = await executePurchase('', +req.params.productId, '');
+  const purchase = await executePurchase('john', +req.params.productId, 'NATE');
   res.send(purchase)
 });
 

@@ -9,7 +9,7 @@ describe('Risk', () => {
             spy.mockResolvedValue(3)
 
             // act
-            const risk = await assessRisk('', '')
+            const risk = await assessRisk('john', 'NATE')
 
             // assert
             expect(risk).toBe(RiskOutcome.REJECTED);
@@ -36,7 +36,7 @@ describe('Risk', () => {
                 spy.mockResolvedValue(97)
 
                 // act
-                const risk = await assessRisk('', '')
+                const risk = await assessRisk('john', 'NATE')
 
                 // assert
                 expect(risk).toBe(RiskOutcome.REJECTED);
@@ -48,7 +48,7 @@ describe('Risk', () => {
                 spy.mockResolvedValue(17)
 
                 // act
-                const risk = await assessRisk('', '')
+                const risk = await assessRisk('john', 'NATE')
 
                 // assert
                 expect(risk).toBe(RiskOutcome.ACCEPTED);
@@ -60,7 +60,7 @@ describe('Risk', () => {
                 spy.mockResolvedValue(85)
 
                 // act
-                const risk = await assessRisk('', '')
+                const risk = await assessRisk('john', 'NATE')
 
                 // assert
                 expect(risk).toBe(RiskOutcome.FLAGGED_FOR_REVIEW);

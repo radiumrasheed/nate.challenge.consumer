@@ -52,20 +52,21 @@ export const executePurchase = async (userId: string, productId: number, payment
         createdAt: new Date().toISOString()
     };
 
-    // get product..., otherwise PurchaseStatus.INVALID_DETAILS
+    // get product...
     const product = getProductById(productId);
     if (!product) {
         console.error('Invalid product details');
         return PurchaseStatus.INVALID_DETAILS;
     }
 
-    // check if balance is enough, otherwise PurchaseStatus.CHARGE_FAILED
-    if (!(await isAffordable(userId, product))) {
+    // check if balance is enough...
+    const userCanAfford = await isAffordable(userId, product)
+    if (!userCanAfford) {
         console.error('Insufficient balance');
         return PurchaseStatus.CHARGE_FAILED;
     }
 
-    // return PENDING and check risk
+    // check risk...
     const riskOutcome = await assessRisk(userId, paymentMethodId);
     switch (riskOutcome) {
         case RiskOutcome.ACCEPTED:
@@ -78,10 +79,7 @@ export const executePurchase = async (userId: string, productId: number, payment
             await flagPurchaseForReview(purchaseDetail);
             return PurchaseStatus.PENDING;
         default:
-        // return PurchaseStatus.REJECTED
+            console.error('could not determine risk outcome')
+            return PurchaseStatus.REJECTED
     }
-
-    const status = getRandomPurchaseStatus();
-
-    return getDelayedPurchaseStatus(status);
 };
