@@ -83,3 +83,10 @@ When a risk assessment is performed, the possible outcomes are:
       - `purchase-api.ts`: an interface for executing a purchase
       - `risk-api.ts`: a collection of interfaces for providing risk-related data about a user or payment method
       - `action-api.ts`: a collection of interfaces for accepting, rejecting, or flagging a purchase after risk assessment
+
+
+
+## Questions
+- Since we are calculating the risk **after** purchase, do we need an API to check the status?
+ - Do I need to set up a way to track purchases, maybe in-memory database?
+ - Or for sake of scope, is it okay to check the risk during the purchase?
